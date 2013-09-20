@@ -7,6 +7,7 @@ function LevelStorage(opts) {
 	}
 
 	if(!opts.path) throw new errors.InitializationError('Level Storage requires a location to be initialized.')
+	if(!opts.key) throw new errors.InitializationError('Level Storage requires a key to be initialized.')
 
 	this._db = levelup(opts.path, {
 		createIfMissing: true
