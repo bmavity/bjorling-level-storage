@@ -11,25 +11,24 @@ describe('level storage, when a projection value is stored', function() {
 		, s
 
 	before(function(done) {
-		var completeGet = eb(function(val) {
+		function completeGet(val) {
 			retrievedVal = val
 			done()
-		})
+		}
 
-		var performGetValue = eb(function() {
+		function performGetValue() {
 	  	s.get({
 	  		theKey: '552230234'
 	  	, anotherVal: 'part of the event'
-	  	}, completeGet)
-		})
+	  	}, eb(done, completeGet))
+		}
 
 		s = storage({
 			key: 'theKey'
 		, path: dbPath
 		})
 
-		s.save(originalValue, performGetValue)
-
+		s.save(originalValue, eb(done, performGetValue))
 	})
 
   it('should allow retrieval of value by key', function() {

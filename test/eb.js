@@ -1,8 +1,8 @@
-function eb(cb) {
+function errback(eb, cb) {
 	return function(err, val) {
-		if(err) return cb(err)
-		cb(val)
+		if(err) return eb(err)
+		if(cb) cb(val)
 	}
 }
 
-module.exports = eb
+module.exports = errback
