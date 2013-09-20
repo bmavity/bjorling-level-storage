@@ -1,11 +1,6 @@
 var storage = require('../')
 	, dbPath = './testdb'
-	, eb = function errback(cb) {
-			return function(err, val) {
-				if(err) return cb(err)
-				cb(val)
-			}
-		}
+	, eb = require('./eb')
 
 describe('level storage, when a projection value is stored', function() {
 	var originalValue = {
