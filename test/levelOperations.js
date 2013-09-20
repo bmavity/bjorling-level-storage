@@ -1,6 +1,7 @@
 var storage = require('../')
 	, dbPath = './testdb/levelOperations'
 	, eb = require('./eb')
+	, leveldown = require('leveldown')
 
 describe('level storage, when a projection value is stored', function() {
 	var originalValue = {
@@ -25,13 +26,15 @@ describe('level storage, when a projection value is stored', function() {
 		s._db.on('error', eb(done))
 
 		s._db.on('ready', eb(done, function() {
-			console.log('ready')
 			s.save(originalValue, eb(done))
 		}))
 	})
 
 	after(function() {
 		s._db.close()
+		leveldown.destroy(dbPath, function(err) {
+			if(err) throw err
+		})
 	})
 
 	it('should store value in level db', function() {
