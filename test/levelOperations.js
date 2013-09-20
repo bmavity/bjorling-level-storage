@@ -19,6 +19,7 @@ describe('level storage, when a projection value is stored', function() {
 		})
 
 		s._db.on('put', function(key, val) {
+			savedKey = key
 			savedVal = val
 			done()
 		})
@@ -35,6 +36,10 @@ describe('level storage, when a projection value is stored', function() {
 		leveldown.destroy(dbPath, function(err) {
 			if(err) throw err
 		})
+	})
+
+	it('should use the proper key', function() {
+		savedKey.should.equal('552230234')
 	})
 
 	it('should store value in level db', function() {

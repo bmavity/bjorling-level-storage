@@ -9,6 +9,7 @@ function LevelStorage(opts) {
 	this._db = levelup(opts.path, {
 		createIfMissing: true
 	})
+	this._key = opts.key
 }
 
 LevelStorage.prototype.get = function(queryObj, cb) {
@@ -18,7 +19,8 @@ LevelStorage.prototype.get = function(queryObj, cb) {
 }
 
 LevelStorage.prototype.save = function(val, cb) {
-	this._db.put(uuid.v4(), val, cb)
+	var keyVal = val[this._key]
+	this._db.put(keyVal, val, cb)
 }
 
 
