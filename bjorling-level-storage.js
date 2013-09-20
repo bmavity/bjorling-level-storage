@@ -1,4 +1,5 @@
 var levelup = require('levelup')
+	, uuid = require('node-uuid')
 
 function LevelStorage(opts) {
 	if(!(this instanceof LevelStorage)) {
@@ -7,8 +8,6 @@ function LevelStorage(opts) {
 
 	this._db = levelup(opts.path, {
 		createIfMissing: true
-	}, function() {
-		console.log(arguments)
 	})
 }
 
@@ -19,7 +18,7 @@ LevelStorage.prototype.get = function(queryObj, cb) {
 }
 
 LevelStorage.prototype.save = function(val, cb) {
-	setImmediate(cb)
+	this._db.put(uuid.v4(), val, cb)
 }
 
 

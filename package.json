@@ -13,7 +13,8 @@
   ],
   "description": "leveldb storage for Bjorling",
   "dependencies": {
-    "levelup": "~0.16.0"
+    "levelup": "~0.16.0",
+    "node-uuid": "~1.4.1"
   },
   "devDependencies": {
     "mocha": "1.x.x",
