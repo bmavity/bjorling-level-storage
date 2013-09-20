@@ -1,5 +1,11 @@
 var storage = require('../')
 	, dbPath = './testdb'
+	, eb = function errback(cb) {
+			return function(err, val) {
+				if(err) return cb(err)
+				cb(val)
+			}
+		}
 
 describe('level storage, when a projection value is stored', function() {
 	var originalValue = {
@@ -10,20 +16,17 @@ describe('level storage, when a projection value is stored', function() {
 		, s
 
 	before(function(done) {
-		function completeGet(err, val) {
-			if(err) return done(err)
+		var completeGet = eb(function(val) {
 			retrievedVal = val
 			done()
-		}
+		})
 
-		function performGetValue(err) {
-			if(err) return done(err)
-
+		var performGetValue = eb(function() {
 	  	s.get({
 	  		theKey: '552230234'
 	  	, anotherVal: 'part of the event'
 	  	}, completeGet)
-		}
+		})
 
 		s = storage({
 			key: 'theKey'
