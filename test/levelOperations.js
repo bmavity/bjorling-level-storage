@@ -13,10 +13,7 @@ describe('level storage, when a projection value is stored', function() {
 		, s
 
 	before(function(done) {
-		s = storage({
-			key: 'theKey'
-		, path: dbPath
-		})
+		s = storage(dbPath, 'theKey')
 
 		s._db.on('put', function(key, val) {
 			savedKey = key

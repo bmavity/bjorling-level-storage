@@ -10,8 +10,8 @@ describe('level storage, when required', function() {
 		storage.should.be.aFunction()
 	})
 
-	it('should accept 1 argument', function() {
-		storage.length.should.equal(1)
+	it('should accept 2 arguments', function() {
+		storage.length.should.equal(2)
 	})
 })
 
@@ -20,10 +20,7 @@ describe('level storage, when properly initialized', function() {
 		, s
 
 	before(function(done) {
-		s = storage({
-			key: 'theKey'
-		, path: dbPath
-		})
+		s = storage(dbPath, 'theKey')
 
 		s._db.on('ready', function() {
 			isReady = true
@@ -56,9 +53,7 @@ describe('level storage, when initialized without a location', function() {
 
 	before(function() {
 		try {
-			storage({
-				key: 'theKey'
-			})
+			storage(null, 'theKey')
 		}
 		catch(ex) {
 			thrownError = ex
@@ -79,9 +74,7 @@ describe('level storage, when initialized without a key', function() {
 
 	before(function() {
 		try {
-			storage({
-				path: dbPath
-			})
+			storage(dbPath)
 		}
 		catch(ex) {
 			thrownError = ex

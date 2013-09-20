@@ -1,18 +1,18 @@
 var levelup = require('levelup')
 	, errors = require('./errors')
 
-function LevelStorage(opts) {
+function LevelStorage(location, key) {
 	if(!(this instanceof LevelStorage)) {
-		return new LevelStorage(opts)
+		return new LevelStorage(location, key)
 	}
 
-	if(!opts.path) throw new errors.InitializationError('Level Storage requires a location to be initialized.')
-	if(!opts.key) throw new errors.InitializationError('Level Storage requires a key to be initialized.')
+	if(!location) throw new errors.InitializationError('Level Storage requires a location to be initialized.')
+	if(!key) throw new errors.InitializationError('Level Storage requires a key to be initialized.')
 
-	this._db = levelup(opts.path, {
+	this._db = levelup(location, {
 		createIfMissing: true
 	})
-	this._key = opts.key
+	this._key = key
 }
 
 LevelStorage.prototype.get = function(queryObj, cb) {

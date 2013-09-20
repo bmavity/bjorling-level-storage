@@ -24,10 +24,7 @@ describe('level storage, when a projection value is stored', function() {
 	  	}, eb(done, completeGet))
 		}
 
-		s = storage({
-			key: 'theKey'
-		, path: dbPath
-		})
+		s = storage(dbPath, 'theKey')
 
 		s.save(originalValue, eb(done, performGetValue))
 	})
