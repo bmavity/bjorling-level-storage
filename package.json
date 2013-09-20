@@ -13,19 +13,20 @@
   ],
   "description": "leveldb storage for Bjorling",
   "dependencies": {
+    "levelup": "~0.16.0"
   },
   "devDependencies": {
-    "mocha": "1.x.x"
-  , "should": "1.x.x"
+    "mocha": "1.x.x",
+    "should": "1.x.x"
   },
   "engines": {
     "node": "0.8.x, 0.10.x"
-  }
-, "scripts": {
-    "test": "mocha -r should -R tap test/**/*.js"
-  , "watch": "mocha -w -r should -R bdd test/**/*.js"
-  }
-, "keywords": [],
+  },
+  "scripts": {
+    "test": "mocha -r should -R tap test/**/*.js",
+    "watch": "mocha -w -r should -R bdd test/**/*.js"
+  },
+  "keywords": [],
   "license": "mit +no-false-attribs, +no-advertising license",
   "main": "./bjorling-level-storage.js",
   "version": "0.5.0"

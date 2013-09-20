@@ -1,5 +1,5 @@
 var storage = require('../')
-	, dbPath = './testdb'
+	, dbPath = './testdb/access'
 	, eb = require('./eb')
 
 describe('level storage, when a projection value is stored', function() {
@@ -29,6 +29,10 @@ describe('level storage, when a projection value is stored', function() {
 		})
 
 		s.save(originalValue, eb(done, performGetValue))
+	})
+
+	after(function() {
+		s._db.close()
 	})
 
   it('should allow retrieval of value by key', function() {

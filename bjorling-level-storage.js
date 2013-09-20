@@ -1,7 +1,15 @@
+var levelup = require('levelup')
+
 function LevelStorage(opts) {
 	if(!(this instanceof LevelStorage)) {
 		return new LevelStorage(opts)
 	}
+
+	this._db = levelup(opts.path, {
+		createIfMissing: true
+	}, function() {
+		console.log(arguments)
+	})
 }
 
 LevelStorage.prototype.get = function(queryObj, cb) {
