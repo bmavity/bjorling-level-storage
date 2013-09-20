@@ -1,10 +1,12 @@
 var levelup = require('levelup')
-	, uuid = require('node-uuid')
+	, errors = require('./errors')
 
 function LevelStorage(opts) {
 	if(!(this instanceof LevelStorage)) {
 		return new LevelStorage(opts)
 	}
+
+	if(!opts.path) throw new errors.InitializationError('Level Storage requires a location to be initialized.')
 
 	this._db = levelup(opts.path, {
 		createIfMissing: true
