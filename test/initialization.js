@@ -90,7 +90,7 @@ describe('bjorling level storage, when initialized with a valid location, and th
 	})
 })
 
-describe('level storage, when initialized without a location', function() {
+describe('bjorling level storage, when initialized without a location', function() {
 	var thrownError
 
 	before(function() {
@@ -110,27 +110,3 @@ describe('level storage, when initialized without a location', function() {
 		thrownError.message.should.include('location')
 	})
 })
-
-/*
-describe('level storage, when initialized without a key', function() {
-	var thrownError
-
-	before(function() {
-		try {
-			storage(dbPath)
-		}
-		catch(ex) {
-			thrownError = ex
-		}
-	})
-
-	it('should cause an InitializationError', function() {
-		thrownError.should.be.instanceOf(errors.InitializationError)
-	})
-
-	it('should cause an error message indicating the problem', function() {
-		thrownError.message.should.include('key')
-	})
-})
-*/
-
