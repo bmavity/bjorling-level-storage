@@ -13,7 +13,8 @@
   ],
   "description": "leveldb storage for Bjorling",
   "dependencies": {
-    "levelup": "~0.16.0",
+    "levelup": "~0.16.0"
+  , "leveldown": "~0.8.0",
     "node-uuid": "~1.4.1",
     "errno": "~0.1.0"
   },
@@ -26,7 +27,7 @@
   },
   "scripts": {
     "test": "mocha -r should -R tap test/**/*.js",
-    "watch": "mocha -w -r should -R bdd test/**/*.js"
+    "watch": "mocha -w -r should -R spec test/**/*.js"
   },
   "keywords": [],
   "license": "mit +no-false-attribs, +no-advertising license",

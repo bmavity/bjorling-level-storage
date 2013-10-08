@@ -3,7 +3,7 @@ var storage = require('../')
 	, eb = require('./eb')
 	, leveldown = require('leveldown')
 
-describe('level storage, when a projection value is stored', function() {
+describe('bjorling level storage, when projection state is stored', function() {
 	var originalValue = {
 			theKey: '552230234'
 		, aVal: 'hiya'
@@ -28,10 +28,10 @@ describe('level storage, when a projection value is stored', function() {
 		}))
 	})
 
-	after(function() {
-		s._db.close()
-		leveldown.destroy(dbPath, function(err) {
-			if(err) throw err
+	after(function(done) {
+		s._db.close(function(err) {
+			if(err) done()
+			leveldown.destroy(dbPath, done)
 		})
 	})
 
