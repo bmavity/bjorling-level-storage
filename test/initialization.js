@@ -2,49 +2,37 @@ var storage = require('../')
 	, errors = require('../errors')
 	, dbPath = './testdb/initialization'
 	, eb = require('./eb')
+	, level = require('levelup')
 	, leveldown = require('leveldown')
 require('./shouldExtensions')
 
-describe('level storage, when required', function() {
-	it('should be a function', function() {
-		storage.should.be.aFunction()
-	})
-
-	it('should accept 2 arguments', function() {
-		storage.length.should.equal(2)
-	})
-})
-
-describe('level storage, when properly initialized', function() {
-	var isReady = false
-		, s
+describe('bjorling level storage, when initialized with a valid location, and the location does not contain an existing leveldb instance', function() {
+	var db = null
 
 	before(function(done) {
-		s = storage(dbPath, 'theKey')
+		var s = storage(dbPath, true)
+
+		function openDb() {
+			level(dbPath, { createIfMissing: false }, function(err, newdb) {
+				if(err) return done(err)
+				db = newdb
+				done()
+			})
+		}
 
 		s._db.on('ready', function() {
-			isReady = true
-			done()
-		})
-
-		s._db.on('error', function() {
-			done()
+			s._db.close(openDb)
 		})
 	})
 
-	after(function() {
-		s._db.close()
-		leveldown.destroy(dbPath, function(err) {
-			if(err) throw err
+	after(function(done) {
+		db.close(function() {
+			leveldown.destroy(dbPath, done)
 		})
 	})
 
-	it('should have a level db with the proper location', function() {
-		s._db.location.should.equal(dbPath)
-	})
-
-	it('should be ready', function() {
-		isReady.should.be.true
+	it('should create a leveldb instance in that location', function() {
+		db.should.not.be.null
 	})
 })
 
@@ -69,6 +57,7 @@ describe('level storage, when initialized without a location', function() {
 	})
 })
 
+/*
 describe('level storage, when initialized without a key', function() {
 	var thrownError
 
@@ -89,4 +78,5 @@ describe('level storage, when initialized without a key', function() {
 		thrownError.message.should.include('key')
 	})
 })
+*/
 

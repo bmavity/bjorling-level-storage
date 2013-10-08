@@ -8,8 +8,8 @@ function LevelStorage(location, key) {
 		return new LevelStorage(location, key)
 	}
 
-	if(!location) throw new errors.InitializationError('Level Storage requires a location to be initialized.')
-	if(!key) throw new errors.InitializationError('Level Storage requires a key to be initialized.')
+	if(!location) throw new errors.InitializationError('Bjorling Level Storage requires a location to be initialized.')
+	//if(!key) throw new errors.InitializationError('Level Storage requires a key to be initialized.')
 
 	this._db = levelQuery(levelup(location, {
 		createIfMissing: true
