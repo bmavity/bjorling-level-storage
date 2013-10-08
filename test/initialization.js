@@ -36,6 +36,60 @@ describe('bjorling level storage, when initialized with a valid location, and th
 	})
 })
 
+describe('bjorling level storage, when initialized with a valid location, and the location contains an existing leveldb instance', function() {
+	var db = null
+		, initialValue = { val: 1 }
+		, getResult
+
+	function putInitialValue(cb) {
+		level(dbPath, { valueEncoding: 'json' }, function(err, initialDb) {
+			if(err) return cb(err)
+			initialDb.put('key1', initialValue)
+			initialDb.close(cb)
+		})
+	}
+
+	function getInitialValue(cb) {
+		level(dbPath, { valueEncoding: 'json' }, function(err, currentDb) {
+			if(err) return cb(err)
+			currentDb.get('key1', function(err, result) {
+				if(err) return cb(err)
+				currentDb.close(function(err) {
+					if(err) return cb(err)
+					cb(null, result)
+				})
+			})
+		})
+	}
+
+	before(function(done) {
+		putInitialValue(function(err) {
+			if(err) return done(err)
+
+			var s = storage(dbPath, true)
+
+			s._db.on('ready', function() {
+				s._db.close(function(err) {
+					if(err) return done(err)
+					getInitialValue(function(err, result) {
+						if(err) return done(err)
+						getResult = result
+						done()
+					})
+				})
+			})
+		})
+	})
+
+	after(function(done) {
+		leveldown.destroy(dbPath, done)
+	})
+
+	it('should use the existing db', function() {
+		getResult.should.eql(initialValue)
+	})
+})
+
 describe('level storage, when initialized without a location', function() {
 	var thrownError
 
