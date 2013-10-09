@@ -4,4 +4,5 @@ var createError = require('errno').create
 module.exports = {
 	BjorlingLevelStorageError: BjorlingLevelStorageError
 , InitializationError: createError('InitializationError', BjorlingLevelStorageError)
+, ProjectionInitializationError: createError('ProjectionInitializationError', BjorlingLevelStorageError)
 }
