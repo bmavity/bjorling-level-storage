@@ -4,23 +4,31 @@ var levelup = require('levelup')
 	, engine = require('jsonquery-engine')
 	, errors = require('./errors')
 
-function LevelStorage(location, key) {
+function LevelStorage(location) {
 	if(!(this instanceof LevelStorage)) {
 		return new LevelStorage(location, key)
 	}
 
 	if(!location) throw new errors.InitializationError('Bjorling Level Storage requires a location to be initialized.')
 
-	this._db = levelQuery(sub(levelup(location, {
+	this._db = sub(levelup(location, {
 		createIfMissing: true
 	, valueEncoding: 'json'
-	})))
+	}))
+}
+
+
+function BjorlingLevelProjectionStorage(db, projectionName, key) {
+	this._db = levelQuery(db)
 	this._db.query.use(engine())
+
 	this._key = key
+	this._projectionName = projectionName
+
 	this._indexes = []
 }
 
-LevelStorage.prototype.get = function(queryObj, cb) {
+BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 	var keyVal = queryObj[this._key]
 	if(keyVal) {
 		return this._db.get(keyVal, cb)
@@ -29,23 +37,27 @@ LevelStorage.prototype.get = function(queryObj, cb) {
 	var indexName = this._indexes[0]
 		, indexVal = queryObj[indexName]
 		, q = {}
+		, result = null
 	q[indexName] = indexVal
 	this._db.query(q)
-		.on('data', function(result) {
-			cb(null, result)
+		.on('data', function(r) {
+			result = r
 		})
 		.on('stats', function(stats) {
 			console.log(stats)
 		})
+		.on('end', function() {
+			cb(null, result)
+		})
 		.on('error', cb)
 }
 
-LevelStorage.prototype.save = function(val, cb) {
+BjorlingLevelProjectionStorage.prototype.save = function(val, cb) {
 	var keyVal = val[this._key]
 	this._db.put(keyVal, val, cb)
 }
 
-LevelStorage.prototype.addIndex = function(index, cb) {
+BjorlingLevelProjectionStorage.prototype.addIndex = function(index, cb) {
 	this._indexes.push(index)
 	this._db.ensureIndex(index)
 	setImmediate(function() {
@@ -53,8 +65,6 @@ LevelStorage.prototype.addIndex = function(index, cb) {
 	})
 }
 
-function BjorlingLevelProjectionStorage(projectionName, key) {
-}
 
 function getArgs(arrayLike) {
 	return Array.prototype.slice.call(arrayLike, 0)
@@ -73,7 +83,8 @@ module.exports = function(location, key) {
 
 				__bjorling.put(projectionName, {}, function(err) {
 					if(err) return cb(err)
-					cb(null, new BjorlingLevelProjectionStorage())
+					var db = s._db.sublevel(projectionName)
+					cb(null, new BjorlingLevelProjectionStorage(db, projectionName, key))
 				})
 			}
 	a._db = s._db

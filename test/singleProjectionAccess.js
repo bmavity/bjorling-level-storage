@@ -1,15 +1,16 @@
 var storage = require('../')
-	, dbPath = './testdb/access'
+	, dbPath = './testdb/singleProjectionAccess'
 	, eb = require('./eb')
 	, leveldown = require('leveldown')
 
 describe('level storage, when retrieving state with an event that contains a value for the key', function() {
-	var originalValue = {
+	var db
+		, originalValue = {
 				theKey: '552230234'
 			, aVal: 'hiya'
 			}
 		, retrievedVal
-		, s
+		, projectionStorage
 
 	before(function(done) {
 		function completeGet(val) {
@@ -18,19 +19,24 @@ describe('level storage, when retrieving state with an event that contains a val
 		}
 
 		function performGetValue() {
-	  	s.get({
+	  	projectionStorage.get({
 	  		theKey: '552230234'
 	  	, anotherVal: 'part of the event'
 	  	}, eb(done, completeGet))
 		}
 
-		s = storage(dbPath, 'theKey')
-
-		s.save(originalValue, eb(done, performGetValue))
+		function performSave(p) {
+			projectionStorage = p
+			projectionStorage.save(originalValue, eb(done, performGetValue))
+		}
+		
+		var s = storage(dbPath)
+		db = s._db
+		s('spec 1', 'theKey', eb(done, performSave))
 	})
 
 	after(function(done) {
-		s._db.close(function(err) {
+		db.close(function(err) {
 			if(err) done()
 			leveldown.destroy(dbPath, done)
 		})
@@ -42,12 +48,14 @@ describe('level storage, when retrieving state with an event that contains a val
 })
 
 describe('level storage, when retrieving state with an event that does not contain a value for the key, but matches an index', function() {
-	var val1 = {
+	var db
+		, val1 = {
 				theKey: 'key1'
 			, aVal: 'val 1'
 			}
 		, retrievedVal
-		, s
+		, projectionStorage
+
 
 	before(function(done) {
 		function completeGet(val) {
@@ -57,21 +65,24 @@ describe('level storage, when retrieving state with an event that does not conta
 
 		function performGetValue() {
 			var evt1
-	  	s.get({
+	  	projectionStorage.get({
 	  	  anotherVal: 'part of the event'
 	  	, aVal: 'val 1'
 	  	}, eb(done, completeGet))
 		}
 
-		s = storage(dbPath, 'theKey')
-
-		s.addIndex('aVal', function() {
-			s.save(val1, eb(done, performGetValue))
-		})
+		var s = storage(dbPath)
+		db = s._db
+		s('proj 2', 'theKey', eb(done, function(p) {
+			projectionStorage = p
+			projectionStorage.addIndex('aVal', function() {
+				projectionStorage.save(val1, eb(done, performGetValue))
+			})
+		}))
 	})
 
 	after(function(done) {
-		s._db.close(function(err) {
+		db.close(function(err) {
 			if(err) done()
 			leveldown.destroy(dbPath, done)
 		})
