@@ -75,17 +75,27 @@ module.exports = function(location, key) {
 		, __bjorling = s._db.sublevel('__bjorling')
 		, a = function(projectionName, key, cb) {
 				if(!projectionName) {
-					return cb(new errors.ProjectionInitializationError('Bjorling Level Projection Storage requires a projection name to be initialized.'))
+					var err = new errors.ProjectionInitializationError('Bjorling Level Projection Storage requires a projection name to be initialized.')
+					if(cb) {
+						return cb(err)
+					}
+					throw err
 				}
 				if(!key) {
-					return cb(new errors.ProjectionInitializationError('Bjorling Level Projection Storage requires a key to be initialized.'))
+					var err = new errors.ProjectionInitializationError('Bjorling Level Projection Storage requires a key to be initialized.')
+					if(cb) {
+						return cb(err)
+					}
+					throw err
 				}
 
+				var db = s._db.sublevel(projectionName)
+					, p = new BjorlingLevelProjectionStorage(db, projectionName, key)
 				__bjorling.put(projectionName, {}, function(err) {
-					if(err) return cb(err)
-					var db = s._db.sublevel(projectionName)
-					cb(null, new BjorlingLevelProjectionStorage(db, projectionName, key))
+					if(err &&  cb) return cb(err)
+					cb && cb(null, p)
 				})
+				return p
 			}
 	a._db = s._db
 	a._key = s._key
