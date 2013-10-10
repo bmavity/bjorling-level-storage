@@ -13,14 +13,18 @@
   ],
   "description": "leveldb storage for Bjorling",
   "dependencies": {
-    "levelup": "~0.16.0"
-  , "leveldown": "~0.8.0",
-    "node-uuid": "~1.4.1",
     "errno": "~0.1.0"
+  , "jsonquery-engine": "0.x.x"
+  , "levelup": "~0.16.0"
+  , "leveldown": "~0.8.0"
+  , "level-queryengine": "0.x.x"
+  , "level-sublevel": "5.x.x"
+ 	, "node-uuid": "~1.4.1"
   },
   "devDependencies": {
-    "mocha": "1.x.x",
-    "should": "1.x.x"
+    "mocha": "1.x.x"
+ 	, "levelweb": "0.x.x"
+  , "should": "1.x.x"
   },
   "engines": {
     "node": "0.8.x, 0.10.x"
