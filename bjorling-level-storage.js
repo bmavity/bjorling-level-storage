@@ -61,7 +61,7 @@ BjorlingLevelProjectionStorage.prototype.addIndex = function(index, cb) {
 	this._indexes.push(index)
 	this._db.ensureIndex(index)
 	setImmediate(function() {
-		cb()
+		cb && cb()
 	})
 }
 
