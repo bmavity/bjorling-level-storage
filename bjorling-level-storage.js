@@ -45,33 +45,74 @@ BjorlingLevelProjectionStorage.prototype.getKeyValue = function(obj) {
 }
 
 BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
-	var keyVal = this.getKeyValue(queryObj)
+	var db = this._db
+		, keyVal = this.getKeyValue(queryObj)
+
 	if(keyVal) {
-		return this._db.get(keyVal, cb)
+		return db.get(keyVal, cb)
 	}
 
-	var indexName = this._indexes[0]
-		, indexVal = queryObj[indexName]
-		, q = {}
-		, result = null
-	//BLM: Don't look here
-	if(!indexVal && indexName === 'roundId') {
-		indexVal = queryObj['batchId']
+	function getIndexVal(index) {
+		var val = queryObj[index]
+		//BLM: Don't look here
+		if(!val && index === 'roundId') {
+			val = queryObj['batchId']
+		}
+		return {
+			name: index
+		, val: val
+		}
 	}
-	if(!indexName || !indexVal) return cb(null, null)
 
-	q[indexName] = indexVal
-	this._db.query(q)
-		.on('data', function(r) {
-			result = r
+	function hasIndexVal(map) {
+		return typeof(map.val) !== 'undefined'
+	}
+
+	var indexVals = this._indexes
+				.map(getIndexVal)
+				.filter(hasIndexVal)
+
+	if(!indexVals.length) {
+		return setImmediate(function() {
+			cb(null, null)
 		})
-		.on('stats', function(stats) {
-			console.log(stats)
-		})
-		.on('end', function() {
-			cb(null, result)
-		})
-		.on('error', cb)
+	}
+
+	var q = {}
+
+	function createQueryObj(map) {
+		var qObj = {}
+		qObj[map.name] = map.val
+		return qObj
+	}
+
+	function performQuery() {
+		var result = null
+			, hasMultiple = false
+
+console.log(q)
+		db.query(q)
+			.on('data', function(r) {
+				hasMultiple = !!result
+				result = r
+			})
+			.on('stats', function(stats) {
+				console.log(stats)
+			})
+			.on('end', function() {
+				if(hasMultiple) return cb(new Error('multiple results'))
+				cb(null, result)
+			})
+			.on('error', cb)
+	}
+
+	if(indexVals.length === 1) {
+		q = createQueryObj(indexVals[0])
+	} else {
+		q.$and = indexVals.map(createQueryObj)
+	}
+
+	return performQuery()
 }
 
 BjorlingLevelProjectionStorage.prototype.save = function(val, cb) {

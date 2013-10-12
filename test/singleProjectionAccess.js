@@ -93,7 +93,7 @@ describe('bjorling level projection storage, when the key is an array and the ge
   })
 })
 
-describe('level storage, when retrieving state with an event that does not contain a value for the key, but matches an index', function() {
+describe('bjorling level projection storage, when retrieving state with an event that does not contain a value for the key, but matches an index', function() {
 	var db
 		, val1 = {
 				theKey: 'key1'
@@ -139,7 +139,63 @@ describe('level storage, when retrieving state with an event that does not conta
   })
 })
 
-describe('level storage, when retrieving state with an event that does not contain a value for the key, but matches an index in an array', function() {
+describe('bjorling level projection storage, when there are multiple indexes and the get parameter contains a value for both indexes, but not a value for the key', function() {
+	var db
+		, faker = {
+				theKey: 'key1'
+			, indexPart1: 'billy'
+			, indexPart2: 'the punk'
+			}
+		, real = {
+				theKey: 'key2'
+			, indexPart1: 'billy'
+			, indexPart2: 'the kid'
+			}
+		, retrievedVal
+		, projectionStorage
+
+
+	before(function(done) {
+		function completeGet(val) {
+			retrievedVal = val
+			done()
+		}
+
+		function performGetValue() {
+			var evt1
+	  	projectionStorage.get({
+	  	  indexPart1: 'billy'
+	  	, indexPart2: 'the kid'
+	  	}, eb(done, completeGet))
+		}
+
+		var s = storage(dbPath)
+		db = s._db
+		s('proj 2', 'theKey', eb(done, function(p) {
+			projectionStorage = p
+			projectionStorage.addIndex('indexPart1', function() {
+				projectionStorage.addIndex('indexPart2', function() {
+					projectionStorage.save(real, eb(done, function() {
+						projectionStorage.save(faker, eb(done, performGetValue))
+					}))
+				})
+			})
+		}))
+	})
+
+	after(function(done) {
+		db.close(function(err) {
+			if(err) done()
+			leveldown.destroy(dbPath, done)
+		})
+	})
+
+  it('should retrieve value that contains both matching index values', function() {
+  	retrievedVal.should.eql(real)
+  })
+})
+
+describe('bjorling level projection storage, when retrieving state with an event that does not contain a value for the key, but matches an index in an array', function() {
 	var db
 		, val1 = {
 				theKey: 'key1'
