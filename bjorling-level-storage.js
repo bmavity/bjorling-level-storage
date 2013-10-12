@@ -28,8 +28,12 @@ function BjorlingLevelProjectionStorage(db, projectionName, key) {
 	this._indexes = []
 }
 
+BjorlingLevelProjectionStorage.prototype.getKeyValue = function(obj) {
+	return obj[this._key]
+}
+
 BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
-	var keyVal = queryObj[this._key]
+	var keyVal = this.getKeyValue(queryObj)
 	if(keyVal) {
 		return this._db.get(keyVal, cb)
 	}
@@ -38,6 +42,12 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 		, indexVal = queryObj[indexName]
 		, q = {}
 		, result = null
+	//BLM: Don't look here
+	if(!indexVal && indexName === 'roundId') {
+		indexVal = queryObj['batchId']
+	}
+	if(!indexName || !indexVal) return cb(null, null)
+
 	q[indexName] = indexVal
 	this._db.query(q)
 		.on('data', function(r) {
@@ -53,7 +63,8 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 }
 
 BjorlingLevelProjectionStorage.prototype.save = function(val, cb) {
-	var keyVal = val[this._key]
+	var keyVal = this.getKeyValue(val)
+	//console.log('saving', this._projectionName, this._key, keyVal)
 	this._db.put(keyVal, val, cb)
 }
 
