@@ -3,7 +3,7 @@ var storage = require('../')
 	, eb = require('./eb')
 	, leveldown = require('leveldown')
 
-describe('level storage, when retrieving state with an event that contains a value for the key', function() {
+describe('bjorling level projection storage, when the key is a single value and the get parameter contains a value for the key', function() {
 	var db
 		, originalValue = {
 				theKey: '552230234'
@@ -33,6 +33,52 @@ describe('level storage, when retrieving state with an event that contains a val
 		var s = storage(dbPath)
 		db = s._db
 		s('spec 1', 'theKey', eb(done, performSave))
+	})
+
+	after(function(done) {
+		db.close(function(err) {
+			if(err) done()
+			leveldown.destroy(dbPath, done)
+		})
+	})
+
+  it('should retrieve the proper state', function() {
+  	retrievedVal.should.eql(originalValue)
+  })
+})
+
+describe('bjorling level projection storage, when the key is an array and the get parameter contains a value for both elements of the key', function() {
+	var db
+		, originalValue = {
+	  		keyPart1: '552230234'
+	  	, keyPart2: 'ppuupp'
+			, aVal: 'hiya'
+			}
+		, retrievedVal
+		, projectionStorage
+
+	before(function(done) {
+		function completeGet(val) {
+			retrievedVal = val
+			done()
+		}
+
+		function performGetValue() {
+	  	projectionStorage.get({
+	  		keyPart1: '552230234'
+	  	, keyPart2: 'ppuupp'
+	  	, anotherVal: 'part of the event'
+	  	}, eb(done, completeGet))
+		}
+
+		function performSave(p) {
+			projectionStorage = p
+			projectionStorage.save(originalValue, eb(done, performGetValue))
+		}
+		
+		var s = storage(dbPath)
+		db = s._db
+		s('spec 1', ['keyPart1', 'keyPart2'], eb(done, performSave))
 	})
 
 	after(function(done) {

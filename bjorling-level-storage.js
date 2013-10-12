@@ -17,6 +17,9 @@ function LevelStorage(location) {
 	}))
 }
 
+function isUndefined(val) {
+	return typeof(val) === 'undefined'
+}
 
 function BjorlingLevelProjectionStorage(db, projectionName, key) {
 	this._db = levelQuery(db)
@@ -29,7 +32,16 @@ function BjorlingLevelProjectionStorage(db, projectionName, key) {
 }
 
 BjorlingLevelProjectionStorage.prototype.getKeyValue = function(obj) {
-	return obj[this._key]
+	var key = this._key
+		, parts = Array.isArray(key) ? key.map(getVal) : [getVal(key)]
+
+	function getVal(keyPart) {
+		return obj[keyPart]
+	}
+
+	if(parts.some(isUndefined)) return null
+
+	return parts.join('')
 }
 
 BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
