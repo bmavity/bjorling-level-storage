@@ -48,8 +48,17 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 	var db = this._db
 		, keyVal = this.getKeyValue(queryObj)
 
+	function respond(err, result) {
+		if(err) {
+			if(err.notFound) return cb(null, null)
+			return cb(err)
+		}
+		cb(null, result)
+	}
+
 	if(keyVal) {
-		return db.get(keyVal, cb)
+		db.get(keyVal, respond)
+		return
 	}
 
 	function getIndexVal(index) {

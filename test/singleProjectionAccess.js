@@ -93,6 +93,50 @@ describe('bjorling level projection storage, when the key is an array and the ge
   })
 })
 
+describe('bjorling level projection storage, when the key is not found', function() {
+	var db
+		, originalValue = {
+	  		aKey: 'keyval'
+			, aVal: 'hiya'
+			}
+		, retrievedVal
+		, projectionStorage
+
+	before(function(done) {
+		function completeGet(val) {
+			retrievedVal = val
+			done()
+		}
+
+		function performGetValue() {
+	  	projectionStorage.get({
+	  		aKey: 'keyVal2'
+	  	, anotherVal: 'part of the event'
+	  	}, eb(done, completeGet))
+		}
+
+		function performSave(p) {
+			projectionStorage = p
+			projectionStorage.save(originalValue, eb(done, performGetValue))
+		}
+		
+		var s = storage(dbPath)
+		db = s._db
+		s('spec 1', 'aKey', eb(done, performSave))
+	})
+
+	after(function(done) {
+		db.close(function(err) {
+			if(err) done()
+			leveldown.destroy(dbPath, done)
+		})
+	})
+
+  it('should result in a null value', function() {
+  	(retrievedVal === null).should.be.true
+  })
+})
+
 describe('bjorling level projection storage, when retrieving state with an event that does not contain a value for the key, but matches an index', function() {
 	var db
 		, val1 = {
