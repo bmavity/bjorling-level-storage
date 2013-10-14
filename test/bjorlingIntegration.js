@@ -18,7 +18,7 @@ describe('bjorling storage integration, when retrieving projection state by id',
 		b.when({
 			'$new': function(e) {
 				return {
-					storageId: e.data.storageId
+					storageId: e.storageId
 				, count: 0
 				, ids: []
 				}
@@ -99,7 +99,7 @@ describe('bjorling storage integration, when retrieving projection state by an i
 		b.when({
 			'$new': function(e) {
 				return {
-					storageId: e.data.storageId
+					storageId: e.storageId
 				, count: 0
 				, ids: []
 				}
