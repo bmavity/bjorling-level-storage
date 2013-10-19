@@ -47,6 +47,7 @@ BjorlingLevelProjectionStorage.prototype.getKeyValue = function(obj) {
 BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 	var db = this._db
 		, keyVal = this.getKeyValue(queryObj)
+		, isRawQuery = !!queryObj.$and
 
 	function respond(err, result) {
 		if(err) {
@@ -76,7 +77,7 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 				.map(getIndexVal)
 				.filter(hasIndexVal)
 
-	if(!indexVals.length) {
+	if(!indexVals.length && !isRawQuery) {
 		return setImmediate(function() {
 			cb(null, null)
 		})
@@ -94,11 +95,16 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 		var result = null
 			, hasMultiple = false
 
-console.log(q)
+console.log(JSON.stringify(q))
 		db.query(q)
 			.on('data', function(r) {
-				hasMultiple = !!result
-				result = r
+				if(isRawQuery) {
+					result = result || []
+					result.push(r)
+				} else {
+					hasMultiple = !!result
+					result = r
+				}
 			})
 			.on('stats', function(stats) {
 				console.log(stats)
@@ -112,6 +118,8 @@ console.log(q)
 
 	if(indexVals.length === 1) {
 		q = createQueryObj(indexVals[0])
+	} else if(queryObj.$and) {
+		q = queryObj
 	} else {
 		q.$and = indexVals.map(createQueryObj)
 	}
