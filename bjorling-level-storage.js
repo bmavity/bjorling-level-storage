@@ -62,14 +62,9 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 	}
 
 	function getIndexVal(index) {
-		var val = queryObj[index]
-		//BLM: Don't look here
-		if(!val && index === 'roundId') {
-			val = queryObj['batchId']
-		}
 		return {
 			name: index
-		, val: val
+		, val: queryObj[index]
 		}
 	}
 
