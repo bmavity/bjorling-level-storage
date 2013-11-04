@@ -95,7 +95,6 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 		var result = null
 			, hasMultiple = false
 
-console.log(JSON.stringify(q))
 		db.query(q)
 			.on('data', function(r) {
 				if(isRawQuery) {
@@ -107,7 +106,7 @@ console.log(JSON.stringify(q))
 				}
 			})
 			.on('stats', function(stats) {
-				console.log(stats)
+				//console.log(stats)
 			})
 			.on('end', function() {
 				if(hasMultiple) return cb(new Error('multiple results'))
