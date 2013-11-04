@@ -1,6 +1,7 @@
 var levelup = require('levelup')
 	, sub = require('level-sublevel')
 	, levelQuery = require('level-queryengine')
+	, deleteStream = require('level-delete-stream')
 	, engine = require('jsonquery-engine')
 	, errors = require('./errors')
 
@@ -124,6 +125,12 @@ BjorlingLevelProjectionStorage.prototype.get = function(queryObj, cb) {
 	}
 
 	return performQuery()
+}
+
+BjorlingLevelProjectionStorage.prototype.reset = function(cb) {
+	var db = this._db
+	db.createKeyStream()
+		.pipe(deleteStream(db, cb))
 }
 
 BjorlingLevelProjectionStorage.prototype.save = function(val, cb) {
